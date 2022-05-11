@@ -1,14 +1,5 @@
 # Synchronise your client and server state in React using Apollo Client
 
-## Running the project
-
-There are 2 folders: `./client` and `./server`. We will mainly work in the client, but we need the server to act as a GraphQL backend.
-
-1. `cd server && npm install`
-2. `cd client && npm install`
-3. In two terminals, run `npm start` in the client and then the server folder (you can also run `npm start` in the root, which will start both)
-
-
 ## The example app
 
 Collaborative note-taking application. Users will be able to either make quick edits to a running list of notes
@@ -29,6 +20,16 @@ We'll be looking at how Apollo helps us to:
 [App Mock](./note-tacking-app.png)
 following the [course](https://egghead.io/courses/manage-state-in-react-apps-with-apollo-client-and-graphql-a45b3b89), towards the end of  we'll be adding a "collaborative" layer to the app, where we'll subscribe (via websocket) to updates from other users
 and integrate those into our notes.
+
+
+## Running the project
+
+There are 2 folders: `./client` and `./server`. We will mainly work in the client, but we need the server to act as a GraphQL backend.
+
+1. `cd server && npm install`
+2. `cd client && npm install`
+3. In two terminals, run `npm start` in the client and then the server folder (you can also run `npm start` in the root, which will start both)
+
 
 ### Apollo Client
 
