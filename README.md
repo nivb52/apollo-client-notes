@@ -17,8 +17,7 @@ We'll be looking at how Apollo helps us to:
 - sync the cache to the browser's local storage, so that notes load instantly when the user opens the app
 - and many others!
 
-[App Mock](./note-tacking-app.png)
-following the [course](https://egghead.io/courses/manage-state-in-react-apps-with-apollo-client-and-graphql-a45b3b89), towards the end of  we'll be adding a "collaborative" layer to the app, where we'll subscribe (via websocket) to updates from other users
+Following the [course](https://egghead.io/courses/manage-state-in-react-apps-with-apollo-client-and-graphql-a45b3b89), towards the end of  we'll be adding a "collaborative" layer to the app, where we'll subscribe (via websocket) to updates from other users
 and integrate those into our notes.
 
 
