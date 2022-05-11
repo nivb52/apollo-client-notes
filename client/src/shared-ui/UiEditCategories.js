@@ -14,7 +14,7 @@ function UiEditCategories({ categories, onEditCategory }) {
   function saveCategory(e, id) {
     e.preventDefault();
     const label = e.target.elements[`categoryLabel-${id}`].value;
-    onEditCategory({ id, label });
+    onEditCategory( id, label );
   }
   return (
     <Stack>
