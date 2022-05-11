@@ -1,15 +1,21 @@
 # Synchronise your client and server state in React using Apollo Client
 
+## Running the project
+
+There are 2 folders: `./client` and `./server`. We will mainly work in the client, but we need the server to act as a GraphQL backend.
+
+1. `cd server && npm install`
+2. `cd client && npm install`
+3. In two terminals, run `npm start` in the client and then the server folder (you can also run `npm start` in the root, which will start both)
+
 
 ## The example app
 
-In this course, we'll be building a collaborative note-taking application. Users will be able to either make quick edits to a running list of notes
+Collaborative note-taking application. Users will be able to either make quick edits to a running list of notes
 or explore specific notes in more detail, getting access to more specialised text editing functions.
 
 ![App Screenshot](app_screenshot.png)
 
-Towards the end of the course we'll be adding a "collaborative" layer to the app, where we'll subscribe (via websocket) to updates from other users
-and integrate those into our notes.
 
 We'll be looking at how Apollo helps us to:
 
@@ -21,15 +27,8 @@ We'll be looking at how Apollo helps us to:
 - and many others!
 
 [App Mock](./note-tacking-app.png)
-
-## Running the project
-
-There are 2 folders: `./client` and `./server`. We will mainly work in the client, but we need the server to act as a GraphQL backend.
-
-1. `cd server && npm install`
-2. `cd client && npm install`
-3. In two terminals, run `npm start` in the client and then the server folder (you can also run `npm start` in the root, which will start both)
-
+following the [course](https://egghead.io/courses/manage-state-in-react-apps-with-apollo-client-and-graphql-a45b3b89), towards the end of  we'll be adding a "collaborative" layer to the app, where we'll subscribe (via websocket) to updates from other users
+and integrate those into our notes.
 
 ### Apollo Client
 
@@ -49,9 +48,6 @@ Not only that, it also brings a lot of utilities for solving common UI requireme
 pagination, websocket subscriptions, optimistic UIs with rollbacks and even transitioning to offline-first apps by syncing the cache
 to local storage.
 
-And in this course we'll be exploring how to use Apollo Client in a React app to ensure it remains responsive to user actions while avoiding
-stale and falsy data.
-
 
 ## More Info
 
@@ -68,3 +64,5 @@ But introducing optimisations like these can come at the risk of stale or even f
 be efficiently re-used, we have to make sure it's kept up to date: if a user changes their email in one place, we don't want to display their old
 email in another component that is still listening to some old version of the data. Even though that second component loads super fast, it shows
 wrong data, so it's not okay.
+
+We will need to solve it. 
