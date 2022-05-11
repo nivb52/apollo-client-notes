@@ -17,10 +17,6 @@ We'll be looking at how Apollo helps us to:
 - sync the cache to the browser's local storage, so that notes load instantly when the user opens the app
 - and many others!
 
-Following the [course](https://egghead.io/courses/manage-state-in-react-apps-with-apollo-client-and-graphql-a45b3b89), towards the end of  we'll be adding a "collaborative" layer to the app, where we'll subscribe (via websocket) to updates from other users
-and integrate those into our notes.
-
-
 ## Running the project
 
 There are 2 folders: `./client` and `./server`. We will mainly work in the client, but we need the server to act as a GraphQL backend.
@@ -47,6 +43,9 @@ only reach out to the server when necessary. It's not just a client library for 
 Not only that, it also brings a lot of utilities for solving common UI requirements, such as: handling loading and error states,
 pagination, websocket subscriptions, optimistic UIs with rollbacks and even transitioning to offline-first apps by syncing the cache
 to local storage.
+
+Following the [course](https://egghead.io/courses/manage-state-in-react-apps-with-apollo-client-and-graphql-a45b3b89), towards the end of  we'll be adding a "collaborative" layer to the app, where we'll subscribe (via websocket) to updates from other users
+and integrate those into our notes.
 
 
 ## More Info
