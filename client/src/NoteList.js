@@ -63,7 +63,8 @@ export function NoteList({ category }) {
               return existingNotes.filter((noteRef) => cache.identify(noteRef) !== deletedNoteId);
             },
           },
-      });
+        });
+      cache.evict({ id: deletedNoteId });
     },
   });
 
