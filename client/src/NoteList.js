@@ -1,4 +1,4 @@
-import { Heading, Spinner, Stack } from "@chakra-ui/react";
+import { Heading, Spinner, Stack, useToast } from "@chakra-ui/react";
 import { DeleteButton, UiNote, ViewNoteButton } from "./shared-ui";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { Link } from "react-router-dom";
@@ -35,6 +35,7 @@ export function NoteList({ category }) {
     },
     errorPolicy: "all",
   });
+  const toast = useToast();
 
   const [deleteNote, deleteResponse] = useMutation(DELETE_NOTE_MUTATION, {
     //refetchQueries: ["GetAllNotes"],
@@ -67,12 +68,22 @@ export function NoteList({ category }) {
   });
 
   const deleteNoteHandler = useCallback((noteId) => {
-    deleteNote({
-      variables: {
-        noteId,
-      },
-      errorPolicy: "all",
-    });
+      deleteNote({
+        variables: {
+          noteId,
+        },
+        errorPolicy: "none",
+      }).catch((err) => {
+        logger({ err });
+        toast({
+          title: "failed to delete note",
+          description: 'something went wrong',
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+        return {}
+      });
   }, [deleteNote]);
 
   if (error && !data) {
@@ -104,3 +115,4 @@ export function NoteList({ category }) {
     </Stack>
   );
 }
+ 
