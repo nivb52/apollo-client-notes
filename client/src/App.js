@@ -1,5 +1,5 @@
 import { UiAppLayout } from "./shared-ui/UiAppLayout";
-import { Stack } from "@chakra-ui/react";
+import { Spinner, Stack } from "@chakra-ui/react";
 import { NoteList } from "./NoteList";
 import { useState } from "react";
 import { SelectCategory } from "./SelectCategory";
@@ -17,16 +17,11 @@ const ALL_CATEGORIES_QUERY = gql`
   }
 `;
 
-  const categories = [
-    { id: "1", label: "✈️ Holiday Planning" },
-    { id: "2", label: "🛒 Shopping" },
-    { id: "3", label: "📝 Saved articles" },
-  ];
-
 function App() {
   const [selectedCategory, setSelectedCategory] = useState("1");
-    const { data, loading, error } = useQuery(ALL_CATEGORIES_QUERY);
-  if (error && !data) data.categories = categories;
+  const { data, loading , error } = useQuery(ALL_CATEGORIES_QUERY);
+  if (loading) return <Spinner />;
+  else if (error && !data) return <Heading> Could not load categories. </Heading>;
   
   return (
     <UiAppLayout>

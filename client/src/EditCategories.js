@@ -1,5 +1,5 @@
 
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { UiEditCategories } from "./shared-ui";
 
 const UPDATE_CATEGORY_MUTATION = gql`
@@ -11,7 +11,7 @@ const UPDATE_CATEGORY_MUTATION = gql`
     }
 `;
 
-function EditCategories({categories}) {
+function EditCategories({categories = []}) {
     const [onEditCategory] = useMutation(UPDATE_CATEGORY_MUTATION);
     
     return (
