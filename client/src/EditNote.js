@@ -16,12 +16,13 @@ const UPDATE_NOTE_MUTATION = gql`
 `;
 
 const NOTE_QUERY = gql`
-    query GetNote($id: String!) {
-        note(id: $id) {
-            id
-            content
-        }
+  query GetNote($id: String!) {
+    note(id: $id) {
+      id
+      content
+      isSelected @client
     }
+  }
 `;
 
 
@@ -46,10 +47,9 @@ export function EditNote() {
           updateNote({ variables: { id: noteId, content: newContent } });
         }}
         note={
-          noteResponse?.data?.successful
-            ? noteResponse.data?.note
-            : data?.note 
+          noteResponse?.data?.successful ? noteResponse.data?.note : data?.note
         }
+        isNoteSelected={data?.note?.isSelected}
       />
     );
 }

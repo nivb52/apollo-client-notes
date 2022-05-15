@@ -1,14 +1,15 @@
-import { Heading, Spinner, Stack, useToast } from "@chakra-ui/react";
-import { DeleteButton, UiNote, ViewNoteButton } from "./shared-ui";
+import { Checkbox, Heading, Spinner, Stack, useToast } from "@chakra-ui/react";
+import { DeleteButton, UiLoadMoreButton, UiNote, ViewNoteButton } from "./shared-ui";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import { Link } from "react-router-dom";
 import { useCallback } from "react";
-
+import { selectNoteHandler } from ".";
 const ALL_NOTES_QUERY = gql`
-  query GetAllNotes($categoryId: String) {
-    notes(categoryId: $categoryId) {
+  query GetAllNotes($categoryId: String, $offset: Int, $limit: Int) {
+    notes(categoryId: $categoryId, offset: $offset, limit: $limit) {
       id
       content
+      isSelected @client
       category {
         id
         label
@@ -29,12 +30,15 @@ const DELETE_NOTE_MUTATION = gql`
 `;
 
 export function NoteList({ category }) {
-  const { data, loading, error } = useQuery(ALL_NOTES_QUERY, {
+  const { data, loading, error, fetchMore } = useQuery(ALL_NOTES_QUERY, {
     variables: {
       categoryId: category,
+      offset: 0,
+      limit: 3
     },
     errorPolicy: "all",
   });
+  
   const toast = useToast();
 
   const [deleteNote, deleteResponse] = useMutation(DELETE_NOTE_MUTATION, {
@@ -95,7 +99,15 @@ export function NoteList({ category }) {
     return <Spinner />;
   }
 
-  const notes = data?.notes.filter((note) => !!note);
+
+
+  const notes = data?.notes.filter(Boolean);
+  const loadMoreNotes = () => {
+    fetchMore({
+      variables: { offset: notes.length, limit: notes.length + 3 },
+    });
+  };
+
   return (
     <Stack spacing={4}>
       {notes?.map((note) => (
@@ -103,7 +115,15 @@ export function NoteList({ category }) {
           key={note.id}
           content={note.content}
           category={note.category.label}
+          isSelected={note.isSelected}
         >
+          <Checkbox
+            onChange={selectNoteHandler.bind(null, note.id, !note.isSelected)}
+            isChecked={note.isSelected}
+          >
+            Mark
+          </Checkbox>
+
           <Link to={`/note/${note.id}`}>
             <ViewNoteButton />
           </Link>
@@ -113,6 +133,7 @@ export function NoteList({ category }) {
           />
         </UiNote>
       ))}
+      <UiLoadMoreButton onClick={loadMoreNotes} />
     </Stack>
   );
 }

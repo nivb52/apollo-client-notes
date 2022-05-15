@@ -5,8 +5,10 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter } from "react-router-dom";
-import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, from } from "@apollo/client";
+import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, from, makeVar } from "@apollo/client";
 import { RetryLink } from '@apollo/client/link/retry';
+
+const selectedNoteIds$ = makeVar([]);
 
 const httpLink = new HttpLink({
   uri: "http://localhost:4000/graphql"
@@ -21,7 +23,30 @@ const retryLink = new RetryLink({
 });
 
 const client = new ApolloClient({
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          notes: {
+            keyArgs: ["categoryId"],
+            merge(existing = [], incoming = []) {
+              return [...existing, ...incoming];
+            },
+          }
+        }
+      },
+      Note: {
+        fields: {
+          isSelected: {
+            read: (currIsCheckedValue, helpers) => {
+              const id = helpers.readField("id");              
+              return selectedNoteIds$().includes(id);
+            },
+          }
+        }
+      }
+    }
+  }),
   link: from([retryLink, httpLink])
 });
 
@@ -37,3 +62,13 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById("root")
 );
+
+
+
+export const selectNoteHandler = (noteId, isSelected) => {
+  logger(`note.id: ` + noteId, `  isSelected: ` + isSelected);
+  const currSelectedNotes = selectedNoteIds$();
+  if (isSelected) {
+    currSelectedNotes.push(noteId); //using reference 
+  } else selectedNoteIds$(currSelectedNotes.filter((id) => id !== noteId));
+};
