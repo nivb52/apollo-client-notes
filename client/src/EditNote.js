@@ -28,14 +28,14 @@ const NOTE_QUERY = gql`
 
 export function EditNote() {
     const { noteId } = useParams();
-    let { data } = useQuery(NOTE_QUERY, {
+    let { data, loading: notLoading } = useQuery(NOTE_QUERY, {
         variables: {
             id: noteId
         }
     });
     const [updateNote, noteResponse] = useMutation(UPDATE_NOTE_MUTATION);
 
-    if (noteResponse && noteResponse.loading && !noteResponse.data)
+    if (notLoading || noteResponse && noteResponse.loading && !noteResponse.data)
       return <Spinner />;
     else if (noteResponse?.error)
       return <Heading> Could not load note. </Heading>;
