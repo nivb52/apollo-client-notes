@@ -37,8 +37,10 @@ const client = new ApolloClient({
             // cache redirect policy
             read: (existingCachedVal, helpers) => {
               const queriedNoteId = helpers.args.id;
-              // return { __ref: `Note${queriedNoteId}`}
-              return helpers.toReference({ __typename: 'Note', id: queriedNoteId})
+              return helpers.toReference({
+                __typename: "Note",
+                id: queriedNoteId,
+              }); // equivelant to { __ref: `Note${queriedNoteId}`}
             }
           }
         }
