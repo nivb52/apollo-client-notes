@@ -32,6 +32,14 @@ const client = new ApolloClient({
             merge(existing = [], incoming = []) {
               return [...existing, ...incoming];
             },
+          }, 
+          note: {
+            // cache redirect policy
+            read: (existingCachedVal, helpers) => {
+              const queriedNoteId = helpers.args.id;
+              // return { __ref: `Note${queriedNoteId}`}
+              return helpers.toReference({ __typename: 'Note', id: queriedNoteId})
+            }
           }
         }
       },
