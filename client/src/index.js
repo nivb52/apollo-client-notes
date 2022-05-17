@@ -55,7 +55,7 @@ const client = new ApolloClient({
           notes: {
             keyArgs: ["categoryId"],
             merge(existing = [], incoming = []) {
-              return [...existing, ...incoming];
+              return [  ...incoming, ...existing];
             },
           },
           note: {

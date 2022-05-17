@@ -1,8 +1,8 @@
 import { Text, Checkbox, Heading, Spinner, Stack, useToast } from "@chakra-ui/react";
 import { DeleteButton, UiLoadMoreButton, UiNote, ViewNoteButton } from "./shared-ui";
-import { gql, useQuery, useMutation, useSubscription } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 import { Link } from "react-router-dom";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { selectNoteHandler } from ".";
 const ALL_NOTES_QUERY = gql`
   query GetAllNotes($categoryId: String, $offset: Int, $limit: Int) {
@@ -43,7 +43,7 @@ const NOTE_SUBSCRIPTION = gql`
 `;
 
 export function NoteList({ category }) {
-  const { data, loading, error, fetchMore } = useQuery(ALL_NOTES_QUERY, {
+  const { data, loading, error, fetchMore, subscribeToMore } = useQuery(ALL_NOTES_QUERY, {
     variables: {
       categoryId: category,
       offset: 0,
@@ -67,49 +67,63 @@ export function NoteList({ category }) {
           },
         },
       }
-    }, 
+    },
     update: (cache, mutationResult) => {
-      logger({mutationResult});
-        const deletedNoteId = cache.identify(
-          mutationResult?.data?.deleteNote?.note
-        );
-        cache.modify({
-          fields: {
-            notes: (existingNotes) => {
-              logger({ existingNotes });
-              return existingNotes.filter((noteRef) => cache.identify(noteRef) !== deletedNoteId);
-            },
+      logger({ mutationResult });
+      const deletedNoteId = cache.identify(
+        mutationResult?.data?.deleteNote?.note
+      );
+      cache.modify({
+        fields: {
+          notes: (existingNotes) => {
+            logger({ existingNotes });
+            return existingNotes.filter((noteRef) => cache.identify(noteRef) !== deletedNoteId);
           },
-        });
+        },
+      });
       cache.evict({ id: deletedNoteId });
     },
   });
 
   const deleteNoteHandler = useCallback((noteId) => {
-      deleteNote({
-        variables: {
-          noteId,
-        },
-        errorPolicy: "none",
-      }).catch((err) => {
-        logger({ err });
-        toast({
-          title: "failed to delete note",
-          description: 'something went wrong',
-          status: "error",
-          duration: 4000,
-          isClosable: true,
-        });
-        return {}
+    deleteNote({
+      variables: {
+        noteId,
+      },
+      errorPolicy: "none",
+    }).catch((err) => {
+      logger({ err });
+      toast({
+        title: "failed to delete note",
+        description: 'something went wrong',
+        status: "error",
+        duration: 4000,
+        isClosable: true,
       });
+      return {}
+    });
   }, [deleteNote]);
 
-
-  const responseNote$ = useSubscription(NOTE_SUBSCRIPTION, {
-    variables: {
-      categoryId: category,
-    }
-  });
+  useEffect(() => {
+    const unsubscribeNotes = subscribeToMore({
+      document: NOTE_SUBSCRIPTION,
+      variables: {
+        categoryId: category,
+      },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const newNote = subscriptionData.data.newSharedNote;
+        logger({ newNote });
+        return {
+          ...prev,          
+          // notes: [/*...prev.notes, -> since there is a merge on update at index.js */ newNote],
+          notes: [newNote],
+        };
+      },
+    });
+    return unsubscribeNotes;
+  }, [category]);
+   
 
   if (error && !data) {
     return <Heading> Could not load notes. </Heading>;
@@ -117,20 +131,7 @@ export function NoteList({ category }) {
 
   if (loading) {
     return <Spinner />;
-  }
-  
-  const newNote = responseNote$?.data?.newSharedNote;
-  const recentChanges =
-    newNote ? (
-      <>
-        <Text> Recent Changes </Text>
-        <UiNote
-          category={newNote.category.label}
-          content={newNote.content}
-        ></UiNote>
-        <Text> --- </Text>
-      </>
-    ) : '';
+  }  
 
   const notes = data?.notes.filter(Boolean);
   const loadMoreNotes = () => {
@@ -141,7 +142,6 @@ export function NoteList({ category }) {
 
   return (
     <Stack spacing={4}>
-      {recentChanges}
       {notes?.map((note) => (
         <UiNote
           key={note.id}
