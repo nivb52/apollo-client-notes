@@ -13,6 +13,7 @@ import { RetryLink } from '@apollo/client/link/retry';
 import { WebSocketLink } from "@apollo/client/link/ws"; // old method
 import { SubscriptionClient } from "subscriptions-transport-ws"; // old method
 import { getMainDefinition } from '@apollo/client/utilities';
+import { persistCache, LocalStorageWrapper } from "apollo3-cache-persist";
 
 const selectedNoteIds$ = makeVar([]);
 const wsLink = new WebSocketLink(
@@ -48,6 +49,13 @@ const retryLink = new RetryLink({
 });
 
 const client = new ApolloClient({
+  defaultOptions: {
+    // query type for (all) useQuery
+    watchQuery: {
+      fetchPolicy: 'cache-and-network', // get cache and also update
+      nextFetchPolicy: 'cache-first', // revert to default
+    }
+  },
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
@@ -85,18 +93,28 @@ const client = new ApolloClient({
   link: from([retryLink, protocolLink]),
 });
 
-ReactDOM.render(
-  <React.StrictMode>
-    <ChakraProvider>
-      <ApolloProvider client={client}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </ApolloProvider>
-    </ChakraProvider>
-  </React.StrictMode>,
-  document.getElementById("root")
-);
+
+persistCache({
+  cache: client.cache,
+  storage: new LocalStorageWrapper(window.localStorage),
+})
+  .then((_) => logger("Restoring from cahce"))
+  .catch((err) => logger("Failed to restore from cache, ", err.message))
+  .finally(() => {
+    ReactDOM.render(
+      <React.StrictMode>
+        <ChakraProvider>
+          <ApolloProvider client={client}>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </ApolloProvider>
+        </ChakraProvider>
+      </React.StrictMode>,
+      document.getElementById("root")
+    );
+  });
+
 
 
 
