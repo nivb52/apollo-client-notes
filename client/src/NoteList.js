@@ -118,7 +118,7 @@ export function NoteList({ category }) {
   if (loading) {
     return <Spinner />;
   }
-  logger({ responseNote$ });
+  
   const newNote = responseNote$?.data?.newSharedNote;
   const recentChanges =
     newNote ? (
