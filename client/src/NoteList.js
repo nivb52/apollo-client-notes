@@ -1,6 +1,6 @@
-import { Checkbox, Heading, Spinner, Stack, useToast } from "@chakra-ui/react";
+import { Text, Checkbox, Heading, Spinner, Stack, useToast } from "@chakra-ui/react";
 import { DeleteButton, UiLoadMoreButton, UiNote, ViewNoteButton } from "./shared-ui";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { gql, useQuery, useMutation, useSubscription } from "@apollo/client";
 import { Link } from "react-router-dom";
 import { useCallback } from "react";
 import { selectNoteHandler } from ".";
@@ -26,6 +26,19 @@ const DELETE_NOTE_MUTATION = gql`
         id
       }
     }
+  }
+`;
+
+const NOTE_SUBSCRIPTION = gql`
+  subscription NewSharedNote($categoryId: String) {
+    newSharedNote(categoryId: $categoryId) {
+      id 
+      content
+      category {
+        id
+        label
+      }
+    }      
   }
 `;
 
@@ -91,6 +104,13 @@ export function NoteList({ category }) {
       });
   }, [deleteNote]);
 
+
+  const responseNote$ = useSubscription(NOTE_SUBSCRIPTION, {
+    variables: {
+      categoryId: category,
+    }
+  });
+
   if (error && !data) {
     return <Heading> Could not load notes. </Heading>;
   }
@@ -98,8 +118,19 @@ export function NoteList({ category }) {
   if (loading) {
     return <Spinner />;
   }
-
-
+  logger({ responseNote$ });
+  const newNote = responseNote$?.data?.newSharedNote;
+  const recentChanges =
+    newNote ? (
+      <>
+        <Text> Recent Changes </Text>
+        <UiNote
+          category={newNote.category.label}
+          content={newNote.content}
+        ></UiNote>
+        <Text> --- </Text>
+      </>
+    ) : '';
 
   const notes = data?.notes.filter(Boolean);
   const loadMoreNotes = () => {
@@ -110,6 +141,7 @@ export function NoteList({ category }) {
 
   return (
     <Stack spacing={4}>
+      {recentChanges}
       {notes?.map((note) => (
         <UiNote
           key={note.id}

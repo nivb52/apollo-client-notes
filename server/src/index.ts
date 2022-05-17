@@ -138,26 +138,17 @@ const resolvers = {
   },
 };
 
-//For polling lesson
-// setInterval(() => {
-//   if (unpublishedCategories.length === 0) {
-//     return;
-//   }
-//   const newCategory = unpublishedCategories.shift();
-//   categories.unshift(newCategory);
-// }, 8000);
-
 // For subscription lesson
-// setInterval(() => {
-//   if (unpublishedNotes.length === 0) {
-//     return;
-//   }
-//   const newNote = unpublishedNotes.shift();
-//   allNotes.unshift(newNote);
-//   pubsub.publish("NEW_SHARED_NOTE", {
-//     newSharedNote: newNote,
-//   });
-// }, 8000);
+setInterval(() => {
+  if (unpublishedNotes.length === 0) {
+    return;
+  }
+  const newNote = unpublishedNotes.shift();
+  allNotes.unshift(newNote);
+  pubsub.publish("NEW_SHARED_NOTE", {
+    newSharedNote: newNote,
+  });
+}, 8000);
 
 (async function () {
   const app = express();
