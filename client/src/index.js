@@ -32,7 +32,7 @@ const protocolLink = split(
     const definition = getMainDefinition(query);
     return (
       definition.kind === 'OperationDefinition' &&
-      definition.operation === 'subscription' // only subscriptions (not query or mutation)
+      definition.operation === 'subscription' // only subscriptions (not "query" or "mutation")
     );
   },
   wsLink,
