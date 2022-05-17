@@ -121,7 +121,7 @@ export function NoteList({ category }) {
           notes: [newNote, ...prev.notes],
           },
           variables: {
-            categoryId: category,
+            categoryId: category, // to target the correct cache
           },
           overwrite: true // overwrite the cache policy (merge fn) only existing notes will be undefiend
         })        
