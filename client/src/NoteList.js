@@ -1,6 +1,6 @@
 import { Text, Checkbox, Heading, Spinner, Stack, useToast } from "@chakra-ui/react";
 import { DeleteButton, UiLoadMoreButton, UiNote, ViewNoteButton } from "./shared-ui";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { useApolloClient, gql, useQuery, useMutation } from "@apollo/client";
 import { Link } from "react-router-dom";
 import { useCallback, useEffect } from "react";
 import { selectNoteHandler } from ".";
@@ -104,6 +104,7 @@ export function NoteList({ category }) {
     });
   }, [deleteNote]);
 
+  const client = useApolloClient();
   useEffect(() => {
     const unsubscribeNotes = subscribeToMore({
       document: NOTE_SUBSCRIPTION,
@@ -111,14 +112,19 @@ export function NoteList({ category }) {
         categoryId: category,
       },
       updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
+        // if (!subscriptionData.data) return prev;
         const newNote = subscriptionData.data.newSharedNote;
-        logger({ newNote });
-        return {
-          ...prev,          
-          // notes: [/*...prev.notes, -> since there is a merge on update at index.js */ newNote],
-          notes: [newNote],
-        };
+        client.cache.writeQuery({
+          query: ALL_NOTES_QUERY,
+          data: {
+          ...prev, // _typename: ...,
+          notes: [newNote, ...prev.notes],
+          },
+          variables: {
+            categoryId: category,
+          },
+          overwrite: true // overwrite the cache policy (merge fn) only existing notes will be undefiend
+        })        
       },
     });
     return unsubscribeNotes;
