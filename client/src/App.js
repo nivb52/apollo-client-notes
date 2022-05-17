@@ -1,5 +1,5 @@
 import { UiAppLayout } from "./shared-ui/UiAppLayout";
-import { Spinner, Stack } from "@chakra-ui/react";
+import { Spinner, Stack, Heading } from "@chakra-ui/react";
 import { NoteList } from "./NoteList";
 import { useState } from "react";
 import { SelectCategory } from "./SelectCategory";

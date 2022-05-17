@@ -7,8 +7,14 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, from, makeVar } from "@apollo/client";
 import { RetryLink } from '@apollo/client/link/retry';
+import { RestLink } from "apollo-link-rest";
 
 const selectedNoteIds$ = makeVar([]);
+
+// Set `RestLink` with your endpoint
+const restLink = new RestLink({
+  uri: "http://localhost:4000/rest-api"
+});
 
 const httpLink = new HttpLink({
   uri: "http://localhost:4000/graphql"
@@ -32,7 +38,7 @@ const client = new ApolloClient({
             merge(existing = [], incoming = []) {
               return [...existing, ...incoming];
             },
-          }, 
+          },
           note: {
             // cache redirect policy
             read: (existingCachedVal, helpers) => {
@@ -41,23 +47,23 @@ const client = new ApolloClient({
                 __typename: "Note",
                 id: queriedNoteId,
               }); // equivelant to { __ref: `Note${queriedNoteId}`}
-            }
-          }
-        }
+            },
+          },
+        },
       },
       Note: {
         fields: {
           isSelected: {
             read: (currIsCheckedValue, helpers) => {
-              const id = helpers.readField("id");              
+              const id = helpers.readField("id");
               return selectedNoteIds$().includes(id);
             },
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   }),
-  link: from([retryLink, httpLink])
+  link: from([retryLink, restLink, httpLink]),
 });
 
 ReactDOM.render(
